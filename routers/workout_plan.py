@@ -44,7 +44,7 @@ def add_exercise_to_plan(plan_id: int, exercise: ExerciseCreate, db: Session = D
     db.add(db_exercise)
     db.commit()
     db.refresh(db_exercise)
-    return db_exercise
+    return ExerciseCreate(**db_exercise.__dict__)
 
 # Get exercises of a workout plan
 @router.get("/{plan_id}/exercises", response_model=list[ExerciseCreate])
@@ -52,4 +52,4 @@ def get_plan_exercises(plan_id: int, db: Session = Depends(get_db)):
     exercises = db.query(Exercise).filter(Exercise.plan_id == plan_id).all()
     if not exercises:
         raise HTTPException(status_code=404, detail="No exercises found for this plan")
-    return exercises
+    return [ExerciseCreate(**exercise.__dict__) for exercise in exercises]
